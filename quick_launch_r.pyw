@@ -162,11 +162,17 @@ class ShortcutLauncher:
         """Create the main menu"""
         menu_items = self.build_menu_from_folder(self.shortcuts_path)
         
-        # Add separator and utility options
+        # Create submenu for app options
+        app_submenu = pystray.Menu(
+            Item('Shortcuts Folder', lambda: self.open_shortcuts_folder()),
+            Item('About', lambda: self.show_about()),
+            pystray.Menu.SEPARATOR,
+            Item('Exit', self.stop)
+        )
+        
+        # Add separator and app submenu
         menu_items.append(pystray.Menu.SEPARATOR)
-        menu_items.append(Item('Shortcuts Folder', lambda: self.open_shortcuts_folder()))
-        menu_items.append(Item('About', lambda: self.show_about()))
-        menu_items.append(Item('Exit', self.stop))
+        menu_items.append(Item(APP_NAME, app_submenu))
         
         return pystray.Menu(*menu_items)
     
