@@ -1,4 +1,4 @@
-A system tray application for quick access to shortcuts, restoring the functionnality of the Quick Launch toolbar that was removed in Windows 11.
+Quick Launch R(estored) is a system tray application for quick access to shortcuts, restoring the functionnality of the Quick Launch toolbar that was removed in Windows 11.
 
 A directory _Shortcuts_ must be created in the same directory as the Python script.  When the script starts, it parses all the content in _Shortcuts_ and build a menu and sub-menus with all the shortcuts (.lnk files).
 
