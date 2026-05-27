@@ -3,7 +3,7 @@ SPDX-License-Identifier: MIT
 """
 
 APP_NAME = "Quick Launch R"
-APP_REV = "1.0"
+APP_REV = "1.01"
 APP_AUTHOR = "mifrey00"
 APP_LIC = "MIT"
 APP_DESCR= "A system tray application for quick access to shortcuts, restoring the functionnality of the Quick Launch toolbar that was removed in Windows 11."
@@ -45,17 +45,17 @@ class ShortcutLauncher:
         dc.rectangle([width // 4, height // 4, width * 3 // 4, height * 3 // 4], fill='white')
         return image
 
-    def execute_lnk(self, lnk_path):
-        """Execute a .lnk file using Windows shell"""
+    def execute_path(self, path):
+        """Execute any file/folder using the Windows shell (like Explorer double-click)."""
         try:
-            os.startfile(lnk_path)
+            os.startfile(path)
         except Exception as e:
-            print(f"Error executing {lnk_path}: {e}")
+            print(f"Error executing {path}: {e}")
 
-    def make_launch_callback(self, lnk_path):
-        """Create a callback function for launching a specific shortcut"""
+    def make_launch_callback(self, path):
+        """Create a callback function for launching a specific path."""
         def launch(icon, item):
-            self.execute_lnk(lnk_path)
+            self.execute_path(path)
         return launch
 
     def is_folder_shortcut(self, lnk_path):
@@ -107,9 +107,9 @@ class ShortcutLauncher:
                         pystray.Menu(*submenu_items)
                     ))
             elif item.suffix.lower() == '.lnk':
-                # Create menu item for .lnk files
+                # Create menu item for .lnk files (keep special folder-target detection)
                 display_name = item.stem  # Remove .lnk extension
-                lnk_path = str(item.resolve())
+                target_path = str(item.resolve())
 
                 # Check if shortcut points to a folder
                 if self.is_folder_shortcut(item):
@@ -119,7 +119,16 @@ class ShortcutLauncher:
 
                 menu_items.append(Item(
                     display_name,
-                    self.make_launch_callback(lnk_path)
+                    self.make_launch_callback(target_path)
+                ))
+            elif item.is_file():
+                # Create menu item for any other file type and let Windows handle it
+                display_name = "📄 " + item.name
+                file_path = str(item.resolve())
+
+                menu_items.append(Item(
+                    display_name,
+                    self.make_launch_callback(file_path)
                 ))
 
         return menu_items
